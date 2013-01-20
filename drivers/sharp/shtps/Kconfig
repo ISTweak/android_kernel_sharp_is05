@@ -1,0 +1,17 @@
+#
+# Sharp Touchscreen configuration
+#
+
+config TOUCHSCREEN_SHTPS
+	tristate "Synaptics RMI4 based touchscreens"
+	default y
+	depends on SPI_MASTER
+
+if TOUCHSCREEN_SHTPS
+
+	config SHTPS_TMA3XX_TMA340_002
+		tristate "TMA3XX TMA340-002"
+		default n
+		depends on TOUCHSCREEN_SHTPS
+
+endif # TOUCHSCREEN_SHTPS

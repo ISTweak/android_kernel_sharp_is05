@@ -1,0 +1,13 @@
+#
+# Proximity device configuration
+#
+# drivers/sharp/proximity/Kconfig
+
+menu "Proximity Configuration"
+
+config SENSORS_PROXIMITY
+	tristate "Proximity Sensor Driver"
+	depends on I2C
+
+endmenu
+

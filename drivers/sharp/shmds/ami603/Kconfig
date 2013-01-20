@@ -1,0 +1,10 @@
+
+menu "AMI603 MDS DRIVER"
+
+config SENSORS_AMI603
+	tristate "AMI603 sensor"
+
+config SENSORS_AMI603_DATA
+	tristate "AMI603 DATA"
+
+endmenu

@@ -1,0 +1,1 @@
+obj-$(CONFIG_SHSD_DRIVER) += shsd_kerl.o

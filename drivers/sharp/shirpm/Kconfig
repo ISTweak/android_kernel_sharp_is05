@@ -1,0 +1,18 @@
+menu "SHARP Infrared drivers"
+
+config SHIRDA
+	bool "SHARP LR388G7 IrDA SIR/FIR driver"
+	default y
+	select SHIRPM
+
+config SHIRRC
+	bool "SHARP LR388G7 IrRemoteControl driver"
+	default y
+	select SHIRPM
+
+config SHIRPM
+	depends on SHIRDA || SHIRRC
+	bool "Infrared Power Management Support"
+	default y
+
+endmenu

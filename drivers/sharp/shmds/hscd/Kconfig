@@ -1,0 +1,3 @@
+config SH_HSCD
+	bool "SHARP compass Device Drivers"
+	depends on I2C

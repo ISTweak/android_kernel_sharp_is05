@@ -1,0 +1,11 @@
+# drivers/sharp/wifi/Kconfig
+
+menu "Wi-Fi Configuration"
+
+config CSR_SYNERGY_WIFI
+	bool "CSR Synergy Wifi Support"
+	default y
+	help
+	  Enable CSR WiFi device driver.
+
+endmenu
