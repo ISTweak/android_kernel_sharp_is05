@@ -167,7 +167,7 @@ struct row_data {
 	unsigned int			cycle_flags;
 };
 
-#define RQ_ROWQ(rq) ((struct row_queue *) ((rq)->elevator_private[0]))
+#define RQ_ROWQ(rq) ((struct row_queue *) ((rq)->elevator_private))
 
 #define row_log(q, fmt, args...)   \
 	blk_add_trace_msg(q, "%s():" fmt , __func__, ##args)
@@ -290,6 +290,13 @@ static void row_add_request(struct request_queue *q,
 		row_log_rowq(rd, rqueue->prio, "added request");
 }
 
+static int row_queue_empty(struct request_queue *q)
+{
+	struct row_data *rd = q->elevator->elevator_data;
+	return list_empty(&rd->curr_queue);
+}
+
+#if 0
 /*
  * row_reinsert_req() - Reinsert request back to the scheduler
  * @q:	dispatch queue
@@ -344,6 +351,7 @@ static bool row_urgent_pending(struct request_queue *q)
 
 	return false;
 }
+#endif
 
 /**
  * row_remove_request() -  Remove given request from scheduler
@@ -606,7 +614,7 @@ row_set_request(struct request_queue *q, struct request *rq, gfp_t gfp_mask)
 	unsigned long flags;
 
 	spin_lock_irqsave(q->queue_lock, flags);
-	rq->elevator_private[0] =
+	rq->elevator_private =
 		(void *)(&rd->row_queues[get_queue_type(rq)]);
 	spin_unlock_irqrestore(q->queue_lock, flags);
 
@@ -621,9 +629,6 @@ static ssize_t row_var_show(int var, char *page)
 
 static ssize_t row_var_store(int *var, const char *page, size_t count)
 {
-	int err;
-	err = kstrtoul(page, 10, (unsigned long *)var);
-
 	return count;
 }
 
@@ -719,8 +724,7 @@ static struct elevator_type iosched_row = {
 		.elevator_merge_req_fn		= row_merged_requests,
 		.elevator_dispatch_fn		= row_dispatch_requests,
 		.elevator_add_req_fn		= row_add_request,
-		.elevator_reinsert_req_fn  = row_reinsert_req,
-		.elevator_is_urgent_fn    = row_urgent_pending,
+		.elevator_queue_empty_fn	= row_queue_empty,
 		.elevator_former_req_fn		= elv_rb_former_request,
 		.elevator_latter_req_fn		= elv_rb_latter_request,
 		.elevator_set_req_fn		= row_set_request,
