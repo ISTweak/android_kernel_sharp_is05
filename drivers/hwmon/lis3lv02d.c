@@ -277,7 +277,7 @@ static irqreturn_t lis302dl_interrupt(int irq, void *dummy)
 	wake_up_interruptible(&lis3_dev.misc_wait);
 	kill_fasync(&lis3_dev.async_queue, SIGIO, POLL_IN);
 out:
-	if (lis3_dev.whoami == WAI_8B && lis3_dev.idev &&
+	if (lis3_dev.pdata && lis3_dev.whoami == WAI_8B && lis3_dev.idev &&
 	    lis3_dev.idev->input->users)
 		return IRQ_WAKE_THREAD;
 	return IRQ_HANDLED;
@@ -693,7 +693,7 @@ int lis3lv02d_init_device(struct lis3lv02d *dev)
 	if (dev->pdata) {
 		struct lis3lv02d_platform_data *p = dev->pdata;
 
-		if (dev->whoami == WAI_8B)
+		if (dev->pdata && dev->whoami == WAI_8B)
 			lis3lv02d_8b_configure(dev, p);
 
 		if (p->irq_cfg)
