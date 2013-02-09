@@ -333,10 +333,12 @@ CHECK		= sparse
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 MODFLAGS	= -DMODULE
-CFLAGS_MODULE   = $(MODFLAGS)
-AFLAGS_MODULE   = $(MODFLAGS)
+COMMON_OPTIMIZE = -fgcse -fforce-addr -ffast-math -fsingle-precision-constant -marm -march=armv7-a -mfpu=neon -fgcse -ftree-vectorize -funswitch-loops -funroll-loops -fipa-cp-clone -pipe
+#COMMON_OPTIMIZE = -march=armv7-a -mtune=cortex-a8 -mfpu=neon -mfloat-abi=softfp -mabi=aapcs-linux -fforce-addr -fomit-frame-pointer -fstrength-reduce
+CFLAGS_MODULE   = $(MODFLAGS) $(COMMON_OPTIMIZE)
+AFLAGS_MODULE   = $(MODFLAGS) $(COMMON_OPTIMIZE)
 LDFLAGS_MODULE  = -T $(srctree)/scripts/module-common.lds
-CFLAGS_KERNEL	=
+CFLAGS_KERNEL	= $(COMMON_OPTIMIZE)
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
