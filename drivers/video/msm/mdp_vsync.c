@@ -157,7 +157,6 @@ void mdp_vsync_clk_disable(void)
 #ifndef CONFIG_SHLCDC_BOARD
 static void mdp_set_vsync(unsigned long data)
 {
-#if 1
 	struct msm_fb_data_type *mfd = (struct msm_fb_data_type *)data;
 	struct msm_fb_panel_data *pdata = NULL;
 
@@ -192,7 +191,6 @@ static void mdp_set_vsync(unsigned long data)
 		add_timer(&mfd->vsync_resync_timer);
 	}
 	mutex_unlock(&vsync_timer_lock);
-#endif
 }
 #endif /*CONFIG_SHLCDC_BOARD*/
 
@@ -332,7 +330,6 @@ static void mdp_set_sync_cfg_1(struct msm_fb_data_type *mfd, int vsync_cnt)
 
 void mdp_config_vsync(struct msm_fb_data_type *mfd)
 {
-#if 1
 	/* vsync on primary lcd only for now */
 	if ((mfd->dest != DISPLAY_LCD) || (mfd->panel_info.pdest != DISPLAY_1)
 	    || (!vsync_mode)) {
@@ -505,15 +502,14 @@ void mdp_config_vsync(struct msm_fb_data_type *mfd)
 		mdp_set_vsync((unsigned long)mfd);
 		#endif /*CONFIG_SHLCDC_BOARD*/
 	}
-#endif
+
 	return;
-#if 1
+
 err_handle:
 	if (mfd->vsync_width_boundary)
 		vfree(mfd->vsync_width_boundary);
 	mfd->panel_info.lcd.vsync_enable = FALSE;
 	printk(KERN_ERR "%s: failed!\n", __func__);
-#endif
 }
 
 void mdp_vsync_resync_workqueue_handler(struct work_struct *work)
@@ -523,7 +519,7 @@ void mdp_vsync_resync_workqueue_handler(struct work_struct *work)
 	struct msm_fb_panel_data *pdata = NULL;
 
 	mfd = container_of(work, struct msm_fb_data_type, vsync_resync_worker);
-#if 1
+
 	if (mfd) {
 		if (mfd->panel_power_on) {
 			pdata =
@@ -546,7 +542,6 @@ void mdp_vsync_resync_workqueue_handler(struct work_struct *work)
 
 	if ((mfd) && (!vsync_fnc_enabled))
 		mfd->vsync_handler_pending = FALSE;
-#endif
 }
 
 boolean mdp_hw_vsync_set_handler(msm_fb_vsync_handler_type handler, void *data)
@@ -557,7 +552,7 @@ boolean mdp_hw_vsync_set_handler(msm_fb_vsync_handler_type handler, void *data)
 	 * enable_irq(MDP_HW_VSYNC_IRQ);
 	 */
 
-	return TRUE;	//TRUE
+	return TRUE;
 }
 
 uint32 mdp_get_lcd_line_counter(struct msm_fb_data_type *mfd)

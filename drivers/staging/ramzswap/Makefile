@@ -1,3 +1,3 @@
-zram-objs	:=	zram_drv.o zram_sysfs.o xvmalloc-kmod/xvmalloc.o
+ramzswap-objs	:=	ramzswap_drv.o xvmalloc.o
 
-obj-$(CONFIG_RAMZSWAP)	+=	zram.o
+obj-$(CONFIG_RAMZSWAP)	+=	ramzswap.o

@@ -484,9 +484,12 @@ EXPORT_SYMBOL(sk_chk_filter);
  */
 static void sk_filter_rcu_release(struct rcu_head *rcu)
 {
+	sk_filter_release_rcu(rcu);
+#if 0
 	struct sk_filter *fp = container_of(rcu, struct sk_filter, rcu);
 
 	sk_filter_release(fp);
+#endif
 }
 
 static void sk_filter_delayed_uncharge(struct sock *sk, struct sk_filter *fp)
@@ -496,6 +499,19 @@ static void sk_filter_delayed_uncharge(struct sock *sk, struct sk_filter *fp)
 	atomic_sub(size, &sk->sk_omem_alloc);
 	call_rcu_bh(&fp->rcu, sk_filter_rcu_release);
 }
+
+/**
+ * 	sk_filter_release_rcu - Release a socket filter by rcu_head
+ *	@rcu: rcu_head that contains the sk_filter to free
+ */
+void sk_filter_release_rcu(struct rcu_head *rcu)
+{
+	struct sk_filter *fp = container_of(rcu, struct sk_filter, rcu);
+
+	kfree(fp);
+}
+EXPORT_SYMBOL(sk_filter_release_rcu);
+
 
 /**
  *	sk_attach_filter - attach a socket filter
