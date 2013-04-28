@@ -3935,65 +3935,7 @@ static struct platform_device sh_hs_device = {
 #endif
 
 #if defined( CONFIG_TOUCHSCREEN_SHTPS )
-#if defined( CONFIG_MACH_NSK )
-/* virtual keys */
-static ssize_t shtps_ryk_vkeys_show(struct kobject *kobj,
-			struct kobj_attribute *attr, char *buf)
-{
-	return sprintf(buf,
-	    __stringify(EV_KEY) ":" __stringify(KEY_MENU) ":90:995:180:66"
-	":" __stringify(EV_KEY) ":" __stringify(KEY_HOME) ":270:995:180:66"
-	":" __stringify(EV_KEY) ":" __stringify(KEY_BACK) ":451:995:180:66"
-	"\n");
-}
-
-static struct kobj_attribute shtps_ryk_vkeys_attr = {
-	.attr = {
-		.mode = S_IRUGO,
-	},
-	.show = &shtps_ryk_vkeys_show,
-};
-
-static struct attribute *shtps_ryk_properties_attrs[] = {
-	&shtps_ryk_vkeys_attr.attr,
-	NULL
-};
-
-static struct attribute_group shtps_ryk_properties_attr_group = {
-	.attrs = shtps_ryk_properties_attrs,
-};
-
-static struct kobject *shtps_ryk_vkeys_properties_kobj;
-#elif defined( CONFIG_MACH_RYK )
-/* virtual keys */
-static ssize_t shtps_ryk_vkeys_show(struct kobject *kobj,
-			struct kobj_attribute *attr, char *buf)
-{
-	return sprintf(buf,
-	    __stringify(EV_KEY) ":" __stringify(KEY_MENU) ":80:882:160:53"
-	":" __stringify(EV_KEY) ":" __stringify(KEY_HOME) ":240:882:160:53"
-	":" __stringify(EV_KEY) ":" __stringify(KEY_BACK) ":401:882:160:53"
-	"\n");
-}
-
-static struct kobj_attribute shtps_ryk_vkeys_attr = {
-	.attr = {
-		.mode = S_IRUGO,
-	},
-	.show = &shtps_ryk_vkeys_show,
-};
-
-static struct attribute *shtps_ryk_properties_attrs[] = {
-	&shtps_ryk_vkeys_attr.attr,
-	NULL
-};
-
-static struct attribute_group shtps_ryk_properties_attr_group = {
-	.attrs = shtps_ryk_properties_attrs,
-};
-
-static struct kobject *shtps_ryk_vkeys_properties_kobj;
-#elif defined( CONFIG_MACH_DECKARD_AS32 )
+#if defined( CONFIG_MACH_DECKARD_AS32 )
 /* virtual keys */
 static ssize_t shtps_gb_vkeys_show(struct kobject *kobj,
 			struct kobj_attribute *attr, char *buf)
@@ -5596,7 +5538,7 @@ static struct mddi_platform_data mddi_pdata = {
 int mdp_core_clk_rate_table[] = {
 	122880000,
 	122880000,
-	122880000,
+	192000000,	//122880000
 	192000000,
 };
 
