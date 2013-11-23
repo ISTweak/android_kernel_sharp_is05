@@ -163,7 +163,7 @@ static inline void bfq_schedule_dispatch(struct bfq_data *bfqd);
  */
 static inline int bfq_bio_sync(struct bio *bio)
 {
-	if (bio_data_dir(bio) == READ || (bio->bi_rw & REQ_SYNC))
+	if (bio_data_dir(bio) == READ || (bio->bi_rw & REQ_RW_SYNC))
 		return 1;
 
 	return 0;
@@ -213,9 +213,9 @@ static struct request *bfq_choose_req(struct bfq_data *bfqd,
 		return rq1;
 	else if (rq_is_sync(rq2) && !rq_is_sync(rq1))
 		return rq2;
-	if ((rq1->cmd_flags & REQ_META) && !(rq2->cmd_flags & REQ_META))
+	if ((rq1->cmd_flags & REQ_RW_META) && !(rq2->cmd_flags & REQ_RW_META))
 		return rq1;
-	else if ((rq2->cmd_flags & REQ_META) && !(rq1->cmd_flags & REQ_META))
+	else if ((rq2->cmd_flags & REQ_RW_META) && !(rq1->cmd_flags & REQ_RW_META))
 		return rq2;
 
 	s1 = blk_rq_pos(rq1);
@@ -681,7 +681,7 @@ static void bfq_remove_request(struct request *rq)
 	bfq_del_rq_rb(rq);
 	spin_unlock(&bfqq->bfqd->eqm_lock);
 
-	if (rq->cmd_flags & REQ_META) {
+	if (rq->cmd_flags & REQ_RW_META) {
 		WARN_ON(bfqq->meta_pending == 0);
 		bfqq->meta_pending--;
 	}
@@ -2457,7 +2457,7 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
 {
 	struct cfq_io_context *cic = RQ_CIC(rq);
 
-	if (rq->cmd_flags & REQ_META)
+	if (rq->cmd_flags & REQ_RW_META)
 		bfqq->meta_pending++;
 
 	bfq_update_io_thinktime(bfqd, cic);
@@ -2510,7 +2510,7 @@ static void bfq_rq_enqueued(struct bfq_data *bfqd, struct bfq_queue *bfqq,
 			if (bfq_bfqq_budget_timeout(bfqq))
 				bfq_bfqq_expire(bfqd, bfqq, 0,
 						BFQ_BFQQ_BUDGET_TIMEOUT);
-			__blk_run_queue(bfqd->queue, false);
+			__blk_run_queue(bfqd->queue);
 		}
 	}
 }
@@ -2839,7 +2839,7 @@ static void bfq_kick_queue(struct work_struct *work)
 	struct request_queue *q = bfqd->queue;
 
 	spin_lock_irq(q->queue_lock);
-	__blk_run_queue(q, false);
+	__blk_run_queue(q);
 	spin_unlock_irq(q->queue_lock);
 }
 
