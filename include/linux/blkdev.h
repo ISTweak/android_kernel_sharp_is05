@@ -93,6 +93,8 @@ enum rq_flag_bits {
 	__REQ_FAILFAST_TRANSPORT, /* no driver retries of transport errors */
 	__REQ_FAILFAST_DRIVER,	/* no driver retries of driver errors */
 	/* above flags must match BIO_RW_* */
+	__REQ_SYNC,    /* request is sync (sync write or read) */
+	__REQ_META,    /* metadata io request */
 	__REQ_DISCARD,		/* request to discard sectors */
 	__REQ_SORTED,		/* elevator knows about this request */
 	__REQ_SOFTBARRIER,	/* may not be passed by ioscheduler */
@@ -122,6 +124,8 @@ enum rq_flag_bits {
 #define REQ_FAILFAST_DEV	(1 << __REQ_FAILFAST_DEV)
 #define REQ_FAILFAST_TRANSPORT	(1 << __REQ_FAILFAST_TRANSPORT)
 #define REQ_FAILFAST_DRIVER	(1 << __REQ_FAILFAST_DRIVER)
+#define REQ_SYNC    	(1 << __REQ_SYNC)
+#define REQ_META    	(1 << __REQ_META)
 #define REQ_DISCARD	(1 << __REQ_DISCARD)
 #define REQ_SORTED	(1 << __REQ_SORTED)
 #define REQ_SOFTBARRIER	(1 << __REQ_SOFTBARRIER)
@@ -322,6 +326,8 @@ struct queue_limits {
 
 	unsigned short		logical_block_size;
 	unsigned short		max_segments;
+	unsigned short		max_hw_segments;
+	unsigned short		max_phys_segments;
 
 	unsigned char		misaligned;
 	unsigned char		discard_misaligned;
@@ -933,8 +939,11 @@ extern struct request_queue *blk_init_allocated_queue(struct request_queue *,
 extern void blk_cleanup_queue(struct request_queue *);
 extern void blk_queue_make_request(struct request_queue *, make_request_fn *);
 extern void blk_queue_bounce_limit(struct request_queue *, u64);
+extern void blk_queue_max_sectors(struct request_queue *, unsigned int);
 extern void blk_queue_max_hw_sectors(struct request_queue *, unsigned int);
 extern void blk_queue_max_segments(struct request_queue *, unsigned short);
+extern void blk_queue_max_phys_segments(struct request_queue *, unsigned short);
+extern void blk_queue_max_hw_segments(struct request_queue *, unsigned short);
 extern void blk_queue_max_segment_size(struct request_queue *, unsigned int);
 extern void blk_queue_max_discard_sectors(struct request_queue *q,
 		unsigned int max_discard_sectors);
@@ -1212,8 +1221,6 @@ static inline void put_dev_sector(Sector p)
 
 struct work_struct;
 int kblockd_schedule_work(struct request_queue *q, struct work_struct *work);
-int kblockd_schedule_delayed_work(struct request_queue *q,
-			struct delayed_work *dwork, unsigned long delay);
 
 #ifdef CONFIG_BLK_CGROUP
 /*

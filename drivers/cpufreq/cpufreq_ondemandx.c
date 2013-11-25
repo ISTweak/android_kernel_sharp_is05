@@ -29,16 +29,16 @@
  * It helps to keep variable names smaller, simpler
  */
 
-#define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(10)
-#define DEF_FREQUENCY_UP_THRESHOLD		(90)
-#define DEF_SAMPLING_DOWN_FACTOR		(60)
-#define MAX_SAMPLING_DOWN_FACTOR		(80000)
+#define DEF_FREQUENCY_DOWN_DIFFERENTIAL		(15)
+#define DEF_FREQUENCY_UP_THRESHOLD		(85)
+#define DEF_SAMPLING_DOWN_FACTOR		(50)
+#define MAX_SAMPLING_DOWN_FACTOR		(100000)
 #define MICRO_FREQUENCY_DOWN_DIFFERENTIAL	(3)
-#define MICRO_FREQUENCY_UP_THRESHOLD		(85)
+#define MICRO_FREQUENCY_UP_THRESHOLD		(95)
 #define MICRO_FREQUENCY_MIN_SAMPLE_RATE		(10000)
 #define MIN_FREQUENCY_UP_THRESHOLD		(11)
 #define MAX_FREQUENCY_UP_THRESHOLD		(100)
-#define DEF_SUSPEND_FREQ				(500000)
+#define DEF_SUSPEND_FREQ                        (384000)
 
 /*
  * The polling frequency of this governor depends on the capability of
@@ -99,8 +99,7 @@ struct cpu_dbs_info_s {
 static DEFINE_PER_CPU(struct cpu_dbs_info_s, od_cpu_dbs_info);
 
 /*
- * dbs_mutex protects data in dbs_tuners_ins from concurrent changes on
- * different CPUs. It protects dbs_enable in governor start/stop.
+ * dbs_mutex protects dbs_enable in governor start/stop.
  */
 static DEFINE_MUTEX(dbs_mutex);
 
@@ -307,11 +306,7 @@ static ssize_t store_sampling_rate(struct kobject *a, struct attribute *b,
 	ret = sscanf(buf, "%u", &input);
 	if (ret != 1)
 		return -EINVAL;
-
-	mutex_lock(&dbs_mutex);
 	dbs_tuners_ins.sampling_rate = max(input, min_sampling_rate);
-	mutex_unlock(&dbs_mutex);
-
 	return count;
 }
 
@@ -324,11 +319,7 @@ static ssize_t store_io_is_busy(struct kobject *a, struct attribute *b,
 	ret = sscanf(buf, "%u", &input);
 	if (ret != 1)
 		return -EINVAL;
-
-	mutex_lock(&dbs_mutex);
 	dbs_tuners_ins.io_is_busy = !!input;
-	mutex_unlock(&dbs_mutex);
-
 	return count;
 }
 
@@ -343,10 +334,7 @@ static ssize_t store_up_threshold(struct kobject *a, struct attribute *b,
 			input < MIN_FREQUENCY_UP_THRESHOLD) {
 		return -EINVAL;
 	}
-
-	mutex_lock(&dbs_mutex);
 	dbs_tuners_ins.up_threshold = input;
-	mutex_unlock(&dbs_mutex);
 	return count;
 }
 
@@ -385,9 +373,7 @@ static ssize_t store_ignore_nice_load(struct kobject *a, struct attribute *b,
 	if (input > 1)
 		input = 1;
 
-	mutex_lock(&dbs_mutex);
 	if (input == dbs_tuners_ins.ignore_nice) { /* nothing to do */
-		mutex_unlock(&dbs_mutex);
 		return count;
 	}
 	dbs_tuners_ins.ignore_nice = input;
@@ -402,8 +388,6 @@ static ssize_t store_ignore_nice_load(struct kobject *a, struct attribute *b,
 			dbs_info->prev_cpu_nice = kstat_cpu(j).cpustat.nice;
 
 	}
-	mutex_unlock(&dbs_mutex);
-
 	return count;
 }
 
@@ -420,10 +404,8 @@ static ssize_t store_powersave_bias(struct kobject *a, struct attribute *b,
 	if (input > 1000)
 		input = 1000;
 
-	mutex_lock(&dbs_mutex);
 	dbs_tuners_ins.powersave_bias = input;
 	ondemandx_powersave_bias_init();
-	mutex_unlock(&dbs_mutex);
 	return count;
 }
 
@@ -462,11 +444,11 @@ static ssize_t store_suspend_freq(struct kobject *a, struct attribute *b,
 	if (ret != 1)
 		return -EINVAL;
 
-	if (input > 1200000)
-		input = 1200000;
+	if (input > 2016000)
+		input = 2016000;
 
-	if (input < 800000)
-		input = 800000;
+	if (input < 122000)
+		input = 122000;
 
 	mutex_lock(&dbs_mutex);
 	dbs_tuners_ins.suspend_freq = input;
@@ -731,9 +713,6 @@ static int should_io_be_busy(void)
 	    boot_cpu_data.x86 == 6 &&
 	    boot_cpu_data.x86_model >= 15)
 		return 1;
-#endif
-#if defined(CONFIG_ARM)
-	return 1;
 #endif
 	return 0;
 }

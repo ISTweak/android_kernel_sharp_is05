@@ -60,7 +60,7 @@ static unsigned int sleep_ideal_freq;
  * Zero disables and causes to always jump straight to max frequency.
  * When below the ideal freqeuncy we always ramp up to the ideal freq.
  */
-#define DEFAULT_RAMP_UP_STEP 128000
+#define DEFAULT_RAMP_UP_STEP 256000
 static unsigned int ramp_up_step;
 
 /*
@@ -836,7 +836,7 @@ static int __init cpufreq_smartass_init(void)
 	}
 
 	// Scale up is high priority
-	up_wq = create_rt_workqueue("ksmartass_up");
+	up_wq = create_workqueue("ksmartass2_up");
 	down_wq = create_workqueue("ksmartass_down");
 	if (!up_wq || !down_wq)
 		return -ENOMEM;

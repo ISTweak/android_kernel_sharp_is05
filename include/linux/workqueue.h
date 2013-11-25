@@ -179,6 +179,24 @@ static inline void destroy_work_on_stack(struct work_struct *work) { }
 #define work_clear_pending(work) \
 	clear_bit(WORK_STRUCT_PENDING, work_data_bits(work))
 
+/*
+ * Workqueue flags and constants.  For details, please refer to
+ * Documentation/workqueue.txt.
+ */
+enum {
+	WQ_NON_REENTRANT	= 1 << 0, /* guarantee non-reentrance */
+	WQ_UNBOUND		= 1 << 1, /* not bound to any cpu */
+	WQ_FREEZEABLE		= 1 << 2, /* freeze during suspend */
+	WQ_RESCUER		= 1 << 3, /* has an rescue worker */
+	WQ_HIGHPRI		= 1 << 4, /* high priority */
+	WQ_CPU_INTENSIVE	= 1 << 5, /* cpu instensive workqueue */
+
+	WQ_DYING		= 1 << 6, /* internal: workqueue is dying */
+
+	WQ_MAX_ACTIVE		= 512,	  /* I like 512, better ideas? */
+	WQ_MAX_UNBOUND_PER_CPU	= 4,	  /* 4 * #cpus for unbound wq */
+	WQ_DFL_ACTIVE		= WQ_MAX_ACTIVE / 2,
+};
 
 extern struct workqueue_struct *
 __create_workqueue_key(const char *name, int singlethread,
